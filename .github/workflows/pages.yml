@@ -35,6 +35,9 @@ jobs:
       - name: Enhance packaging comparison
         run: node enhance-comparison.js
 
+      - name: Rebuild hero composition
+        run: node fix-hero.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
