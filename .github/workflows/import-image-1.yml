@@ -1,0 +1,36 @@
+name: Import uploaded image 1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-image-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Download uploaded image
+        run: |
+          mkdir -p assets/images
+          curl --fail --location --retry 3 \
+            'https://at.adobe.com/idZ5MnQvyjk8Qnzs' \
+            --output assets/images/1.png
+          file assets/images/1.png
+          test -s assets/images/1.png
+
+      - name: Commit image
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/images/1.png
+          git commit -m 'Add hero background image 1.png'
+          git push origin HEAD:main
