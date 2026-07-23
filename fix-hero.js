@@ -36,10 +36,16 @@ html = html.replace(/<section class="hero" id="hero">[\s\S]*?<\/section>/, heroM
 const heroStyles = `
 <style id="wavex-hero-composite-fix">
   .hero-composite{min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;padding:150px 0 64px;background:#080807}
-  .hero-composite-bg{position:absolute;inset:0;overflow:hidden}
+  .hero-composite-bg{position:absolute;inset:0;overflow:hidden;background:#080807}
   .hero-composite-slot{background:#080807!important}
-  .hero-composite-slot img{width:100%;height:100%;object-fit:cover;object-position:center center;transform:scale(1.01)!important;filter:saturate(.96) contrast(1.03)}
-  .hero-composite-slot:after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,8,10,.96) 0%,rgba(5,8,10,.82) 27%,rgba(5,8,10,.3) 51%,rgba(5,8,10,.05) 72%),linear-gradient(0deg,rgba(8,8,7,.94) 0%,transparent 33%);pointer-events:none}
+  .hero-composite-slot img{width:100%;height:100%;object-fit:cover;object-position:center center;transform:scale(1.01)!important;filter:brightness(1.08) saturate(1.02) contrast(1.02)}
+
+  /* Warm product light: lifts the lower-right package and speaker without washing out the scene. */
+  .hero-composite-slot:before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 79% 64%,rgba(255,169,91,.30) 0%,rgba(255,111,38,.17) 19%,rgba(241,90,0,.07) 34%,transparent 52%);mix-blend-mode:screen;pointer-events:none}
+
+  /* Keep the text side dark, but remove the heavy black veil from the product foreground. */
+  .hero-composite-slot:after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,rgba(5,8,10,.96) 0%,rgba(5,8,10,.82) 27%,rgba(5,8,10,.30) 49%,rgba(5,8,10,.03) 70%),linear-gradient(0deg,rgba(8,8,7,.48) 0%,rgba(8,8,7,.16) 18%,transparent 36%);pointer-events:none}
+
   .hero-composite .hero-content{position:relative;z-index:4;width:var(--container)}
   .hero-copy-panel{width:min(49%,670px);padding:32px 0 6px}
   .hero-composite .display{max-width:650px;font-size:clamp(5rem,8.2vw,9.4rem);line-height:.82;letter-spacing:-.075em}
@@ -48,19 +54,21 @@ const heroStyles = `
   .hero-composite .hero-bottom>p{max-width:540px;margin:0;color:#d1c9bf;font-size:clamp(1rem,1.35vw,1.16rem)}
   .hero-composite .hero-meta{justify-content:flex-start;gap:26px;padding-top:21px;border-top:1px solid rgba(255,255,255,.13)}
   .hero-composite .section-label{margin-bottom:30px}
-  .hero-composite .hero-wave{opacity:.14;bottom:12%}
+  .hero-composite .hero-wave{opacity:.10;bottom:10%}
   .hero-composite .slot.has-image:hover img{transform:scale(1.01)!important}
 
   @media(max-width:1100px){
     .hero-copy-panel{width:min(57%,620px)}
     .hero-composite .display{font-size:clamp(4.7rem,9vw,7.4rem)}
-    .hero-composite-slot img{object-position:62% center}
+    .hero-composite-slot img{object-position:62% center;filter:brightness(1.1) saturate(1.02) contrast(1.01)}
+    .hero-composite-slot:before{background:radial-gradient(circle at 77% 63%,rgba(255,169,91,.32) 0%,rgba(255,111,38,.17) 22%,transparent 50%)}
   }
 
   @media(max-width:760px){
     .hero-composite{min-height:920px;align-items:flex-start;padding:145px 0 45px}
-    .hero-composite-slot img{object-position:69% center;filter:brightness(.72) saturate(.95) contrast(1.05)}
-    .hero-composite-slot:after{background:linear-gradient(180deg,rgba(5,8,10,.92) 0%,rgba(5,8,10,.68) 32%,rgba(5,8,10,.15) 61%,rgba(5,8,10,.78) 100%),linear-gradient(90deg,rgba(5,8,10,.72),transparent 72%)}
+    .hero-composite-slot img{object-position:69% center;filter:brightness(.88) saturate(1) contrast(1.03)}
+    .hero-composite-slot:before{background:radial-gradient(circle at 72% 66%,rgba(255,150,72,.28) 0%,rgba(241,90,0,.12) 30%,transparent 55%)}
+    .hero-composite-slot:after{background:linear-gradient(180deg,rgba(5,8,10,.90) 0%,rgba(5,8,10,.62) 31%,rgba(5,8,10,.08) 60%,rgba(5,8,10,.42) 100%),linear-gradient(90deg,rgba(5,8,10,.68),transparent 72%)}
     .hero-copy-panel{width:100%;padding:18px 0 0}
     .hero-composite .display{max-width:100%;font-size:clamp(4.2rem,19vw,7rem)}
     .hero-composite .hero-bottom{max-width:90%;margin-top:28px}
@@ -79,4 +87,4 @@ const heroStyles = `
 html = html.replace('</head>', heroStyles + '\n</head>');
 
 fs.writeFileSync('index.html', html);
-console.log('Rebuilt the hero with one composite image and a protected text-safe column.');
+console.log('Rebuilt the hero with improved foreground light and clearer packaging visibility.');
