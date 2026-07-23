@@ -1,34 +1,42 @@
 # WAVEX Interactive Case Study
 
-Live-ready GitHub Pages structure for the WAVEX packaging and product case study.
+Live GitHub Pages website for the WAVEX packaging and product case study.
 
-## Add images
+## Replace website images
 
-Upload files using the exact paths already referenced in `index.html`.
+All visual slots use simple numbered PNG files:
 
 ```text
-assets/
-├── brand/wavex-logo.svg
-├── hero/
-├── product/
-├── lifestyle/
-├── moodboard/
-├── textures/
-├── icons/
-├── packaging/
-│   ├── 5w/
-│   ├── 10w/
-│   └── family/
-├── features/
-├── manual/
-├── in-box/
-├── pdp/
-└── production/
+assets/images/1.png
+assets/images/2.png
+assets/images/3.png
+...
+assets/images/63.png
 ```
+
+A temporary random image is displayed on the live website whenever a numbered PNG is missing.
+
+To update a section:
+
+1. Open `assets/images/`.
+2. Choose **Add file → Upload files**.
+3. Upload your final image using the required number, such as `1.png`.
+4. Commit the change to `main`.
+5. GitHub Pages automatically republishes the website.
+
+See [`IMAGE-MAP.md`](IMAGE-MAP.md) for the purpose and recommended dimensions of all 63 files.
+
+## Important image rules
+
+- Keep the filename exactly the same.
+- Use PNG for every replacement, even when the image has no transparency.
+- Use transparent backgrounds for product and packaging cutouts.
+- Do not place website headings inside generated images.
+- Use official packaging and manual artwork without rewriting printed text.
 
 ## PDFs
 
-Place these in `pdf/`:
+Place these files in `pdf/` when ready:
 
 - `WAVEX-5W-Packaging.pdf`
 - `WAVEX-10W-Packaging.pdf`
@@ -36,8 +44,4 @@ Place these in `pdf/`:
 
 ## Automatic deployment
 
-Every push to `main` triggers `.github/workflows/pages.yml` and republishes the website through GitHub Pages.
-
-## Important
-
-This repository is currently private. GitHub Pages availability for private repositories depends on the GitHub plan. For a universally accessible public website, change the repository visibility to Public in **Settings → General → Danger Zone → Change repository visibility**.
+Every push to `main` runs `.github/workflows/pages.yml`, prepares the numbered image paths and deploys the website to GitHub Pages.
