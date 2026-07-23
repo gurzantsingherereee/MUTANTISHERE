@@ -80,9 +80,18 @@ html = html
 
 const headInjection = `
 <style>
-  .asset-file-tag{position:absolute;top:14px;right:14px;z-index:20;padding:7px 10px;border:1px solid rgba(255,255,255,.2);border-radius:999px;color:#fff;background:rgba(8,8,7,.78);backdrop-filter:blur(10px);font:700 11px ui-monospace,monospace;letter-spacing:.08em}
+  .asset-file-tag{display:none!important}
+  .slot.has-image .slot-copy,
+  .slot.has-image .slot-path{display:none!important}
+  .slot.has-image{border-color:transparent}
+  .hero-layer.has-image{border-color:transparent;background:transparent;color:transparent}
 </style>
 <script>
+  function markImageReady(img){
+    const holder=img.closest('.slot,.hero-layer');
+    if(holder) holder.classList.add('has-image');
+  }
+
   function useImageFallback(img){
     const src=img.getAttribute('src')||'';
     const match=src.match(/assets\\/images\\/(\\d+)\\.png/);
@@ -93,31 +102,17 @@ const headInjection = `
     }
     img.style.display='none';
   }
-</script>`;
 
-const bodyInjection = `
-<script>
-  (function(){
-    function updateTag(img){
-      const src=img.getAttribute('src')||'';
-      const match=src.match(/assets\\/images\\/(\\d+)\\.png/);
-      if(match) img.dataset.assetNumber=match[1];
-      const number=img.dataset.assetNumber;
-      if(!number) return;
-      const holder=img.closest('.slot,.hero-layer');
-      if(!holder) return;
-      let tag=holder.querySelector(':scope > .asset-file-tag');
-      if(!tag){tag=document.createElement('span');tag.className='asset-file-tag';holder.appendChild(tag);}
-      tag.textContent=number+'.png';
-    }
-    document.querySelectorAll('img[data-asset-number]').forEach(updateTag);
-    const observer=new MutationObserver(records=>records.forEach(record=>{if(record.target.tagName==='IMG') updateTag(record.target);}));
-    document.querySelectorAll('img').forEach(img=>observer.observe(img,{attributes:true,attributeFilter:['src']}));
-  })();
+  document.addEventListener('DOMContentLoaded',function(){
+    document.querySelectorAll('.asset-file-tag').forEach(function(tag){tag.remove();});
+    document.querySelectorAll('.slot img,.hero-layer img').forEach(function(img){
+      img.addEventListener('load',function(){markImageReady(img);});
+      if(img.complete&&img.naturalWidth>0) markImageReady(img);
+    });
+  });
 </script>`;
 
 html = html.replace('</head>', headInjection + '\n</head>');
-html = html.replace('</body>', bodyInjection + '\n</body>');
 
 fs.writeFileSync('index.html', html);
-console.log(`Prepared ${sourcePaths.length} numbered image slots.`);
+console.log(`Prepared ${sourcePaths.length} numbered image slots without visible filename tags.`);
