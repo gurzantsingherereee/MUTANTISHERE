@@ -29,6 +29,9 @@ jobs:
         with:
           enablement: true
 
+      - name: Prepare numbered image placeholders
+        run: node prepare-pages.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
