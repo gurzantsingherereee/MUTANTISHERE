@@ -109,13 +109,13 @@ const signatureAndDocuments = `
     <p class="section-label">20 · Project Documents</p>
     <h2 class="heading">Artwork, structure and user experience in one place.</h2>
     <div class="document-grid">
-      <a class="document-card motion-card" href="pdf/WAVEX-5W-Packaging.pdf" target="_blank" rel="noreferrer">
+      <a class="document-card motion-card" href="./pdf/WAVEX-5W-Packaging.pdf" data-pdf-name="WAVEX-5W-Packaging.pdf" target="_blank" rel="noreferrer">
         <span>01</span><strong>WAVEX 5W Packaging</strong><small>Artwork + structural dieline</small><b>Open PDF ↗</b>
       </a>
-      <a class="document-card motion-card" href="pdf/WAVEX-10W-Packaging.pdf" target="_blank" rel="noreferrer">
+      <a class="document-card motion-card" href="./pdf/WAVEX-10W-Packaging.pdf" data-pdf-name="WAVEX-10W-Packaging.pdf" target="_blank" rel="noreferrer">
         <span>02</span><strong>WAVEX 10W Packaging</strong><small>110 × 110 × 210 mm master</small><b>Open PDF ↗</b>
       </a>
-      <a class="document-card motion-card" href="pdf/WAVEX-User-Manual.pdf" target="_blank" rel="noreferrer">
+      <a class="document-card motion-card" href="./pdf/WAVEX-User-Manual.pdf" data-pdf-name="WAVEX-User-Manual.pdf" target="_blank" rel="noreferrer">
         <span>03</span><strong>WAVEX User Manual</strong><small>Controls, pairing, care and details</small><b>Open PDF ↗</b>
       </a>
     </div>
@@ -157,9 +157,18 @@ const headInjection = `
   .document-card{min-height:330px;display:flex;flex-direction:column;padding:30px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));transition:border-color .3s ease,background .3s ease,transform .3s ease}
   .document-card:hover{border-color:rgba(241,90,0,.75);background:linear-gradient(145deg,rgba(241,90,0,.13),rgba(255,255,255,.02));transform:translateY(-8px)}
   .document-card>span{color:var(--orange);font:12px ui-monospace,monospace}.document-card strong{margin:auto 0 12px;font-size:clamp(1.8rem,3vw,3rem);line-height:.95;letter-spacing:-.05em;text-transform:uppercase}.document-card small{color:var(--grey)}.document-card b{margin-top:26px;color:var(--orange);font-size:.8rem}
-  a.pdf-missing{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}
+  a.pdf-checking{pointer-events:none;opacity:.72}
+  a.pdf-missing{opacity:.55;cursor:not-allowed;filter:grayscale(.35)}
   a.pdf-missing:hover{transform:none!important;border-color:var(--line)!important;background:rgba(255,255,255,.03)!important}
   a.pdf-missing b{color:#ff9b73!important}
+  .pdf-notice{position:fixed;inset:0;z-index:7000;display:none;place-items:center;padding:22px;background:rgba(0,0,0,.78);backdrop-filter:blur(12px)}
+  .pdf-notice.open{display:grid}
+  .pdf-notice-card{width:min(520px,100%);padding:30px;border:1px solid var(--line);border-radius:24px;background:#161511;box-shadow:0 35px 100px rgba(0,0,0,.55)}
+  .pdf-notice-card span{color:var(--orange);font:12px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em}
+  .pdf-notice-card h3{margin:14px 0 12px;font-size:clamp(2rem,6vw,4rem);line-height:.9;letter-spacing:-.06em;text-transform:uppercase}
+  .pdf-notice-card p{color:var(--grey)}
+  .pdf-notice-card code{display:block;margin:18px 0;padding:12px;border-radius:12px;background:#0b0b09;color:#ffb07f;word-break:break-all}
+  .pdf-notice-card button{min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;color:#111;background:var(--orange);cursor:pointer}
   .section:after{content:"";position:absolute;left:50%;bottom:0;width:min(1240px,calc(100vw - 44px));height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);transform:translateX(-50%)}
   .cursor-glow{position:fixed;left:0;top:0;width:420px;height:420px;border-radius:50%;z-index:0;pointer-events:none;background:radial-gradient(circle,rgba(241,90,0,.075),transparent 66%);transform:translate(-50%,-50%);will-change:transform}
   @keyframes wavexFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(.7deg)}}
@@ -190,6 +199,15 @@ const headInjection = `
 
 const bodyInjection = `
 <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="pdf-notice" id="pdfNotice" role="dialog" aria-modal="true" aria-labelledby="pdfNoticeTitle">
+  <div class="pdf-notice-card">
+    <span>Project document unavailable</span>
+    <h3 id="pdfNoticeTitle">PDF not uploaded yet.</h3>
+    <p>The website link is correct, but this file does not currently exist in the GitHub repository.</p>
+    <code id="pdfMissingPath"></code>
+    <button type="button" id="pdfNoticeClose">Close</button>
+  </div>
+</div>
 <script>
   (function(){
     document.querySelectorAll('.asset-file-tag').forEach(function(tag){tag.remove();});
@@ -198,19 +216,51 @@ const bodyInjection = `
       if(img.complete&&img.naturalWidth>0) markImageReady(img);
     });
 
+    const notice=document.getElementById('pdfNotice');
+    const missingPath=document.getElementById('pdfMissingPath');
+    const closeNotice=document.getElementById('pdfNoticeClose');
+    function showPdfNotice(path){
+      if(missingPath) missingPath.textContent=path;
+      if(notice) notice.classList.add('open');
+    }
+    if(closeNotice) closeNotice.addEventListener('click',function(){notice.classList.remove('open');});
+    if(notice) notice.addEventListener('click',function(event){if(event.target===notice) notice.classList.remove('open');});
+
     document.querySelectorAll('a[href$=".pdf"]').forEach(function(link){
-      const url=link.getAttribute('href');
-      fetch(url,{method:'HEAD',cache:'no-store'}).then(function(response){
-        if(!response.ok) throw new Error('PDF missing');
-      }).catch(function(){
+      const rawHref=link.getAttribute('href');
+      const pdfUrl=new URL(rawHref,document.baseURI);
+      link.setAttribute('href',pdfUrl.href);
+
+      function markMissing(){
+        link.classList.remove('pdf-checking');
         link.classList.add('pdf-missing');
         link.setAttribute('aria-disabled','true');
         link.setAttribute('title','This PDF has not been uploaded to GitHub yet.');
         const label=link.querySelector('b');
         if(label) label.textContent='PDF not uploaded';
-        link.addEventListener('click',function(event){
-          event.preventDefault();
-          alert('This PDF has not been uploaded yet. Add it to the pdf folder using the exact filename shown in the repository instructions.');
+      }
+
+      fetch(pdfUrl.href,{method:'HEAD',cache:'no-store'}).then(function(response){
+        if(!response.ok) markMissing();
+      }).catch(markMissing);
+
+      link.addEventListener('click',function(event){
+        event.preventDefault();
+        if(link.classList.contains('pdf-checking')) return;
+        link.classList.add('pdf-checking');
+
+        const newTab=window.open('about:blank','_blank');
+        fetch(pdfUrl.href,{method:'GET',headers:{Range:'bytes=0-16'},cache:'no-store'}).then(function(response){
+          const type=(response.headers.get('content-type')||'').toLowerCase();
+          if(!response.ok || !type.includes('pdf')) throw new Error('PDF missing');
+          link.classList.remove('pdf-checking','pdf-missing');
+          link.removeAttribute('aria-disabled');
+          if(newTab) newTab.location.href=pdfUrl.href;
+          else window.location.href=pdfUrl.href;
+        }).catch(function(){
+          if(newTab) newTab.close();
+          markMissing();
+          showPdfNotice('pdf/'+(link.dataset.pdfName||pdfUrl.pathname.split('/').pop()));
         });
       });
     });
@@ -233,7 +283,8 @@ const bodyInjection = `
       const finalImage=document.querySelector('.final-bg img');
       if(heroImage) heroImage.style.transform='scale(1.07) translate3d(0,'+(y*.09)+'px,0)';
       if(finalImage){
-        const rect=document.querySelector('.final')?.getBoundingClientRect();
+        const finalSection=document.querySelector('.final');
+        const rect=finalSection?finalSection.getBoundingClientRect():null;
         if(rect) finalImage.style.transform='scale(1.06) translate3d(0,'+(-rect.top*.035)+'px,0)';
       }
       ticking=false;
@@ -262,4 +313,4 @@ html = html.replace('</head>', headInjection + '\n</head>');
 html = html.replace('</body>', bodyInjection + '\n</body>');
 
 fs.writeFileSync('index.html', html);
-console.log('Prepared 64 numbered image slots, motion effects, PDF status checks and project-document links.');
+console.log('Prepared numbered image slots, motion effects, robust PDF links and document availability checks.');
