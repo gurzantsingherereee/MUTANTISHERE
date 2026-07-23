@@ -4,11 +4,15 @@ Upload every replacement image to `assets/images/` using the exact filename show
 
 The website shows a temporary random image when a numbered PNG is missing. Replacing that file and committing it will update the live website automatically.
 
+## Hero update
+
+The hero now uses **one complete composition** to prevent the headline, box and speaker from overlapping. Upload the final combined hero as `1.png`. Files `2.png` and `3.png` remain optional source layers and are not displayed separately in the current hero.
+
 | File | Section | What to add | Recommended size |
 |---|---|---|---|
-| `1.png` | Hero | Cinematic mountain-sunset background; left side clear for heading | 2560 × 1440 |
-| `2.png` | Hero | WAVEX 10W packaging cutout, transparent background | 2200 × 3200 |
-| `3.png` | Hero | WAVEX speaker cutout, transparent background | 2200 × 3000 |
+| `1.png` | Hero | Complete cinematic hero composition: mountain sunset, WAVEX package and speaker on the right; left side dark and clear for HTML headline | 2560 × 1440 |
+| `2.png` | Hero source — optional | Original WAVEX 10W packaging cutout used only when creating or revising the combined hero | 2200 × 3200 |
+| `3.png` | Hero source — optional | Original WAVEX speaker cutout used only when creating or revising the combined hero | 2200 × 3000 |
 | `4.png` | Project Snapshot | Speaker three-quarter cutout | 2200 × 3000 |
 | `5.png` | Big Idea | Speaker in a premium mountain campsite | 2560 × 1440 |
 | `6.png` | Strategy | Product macro with mesh, orange loop and RGB detail | 2400 × 1600 |
