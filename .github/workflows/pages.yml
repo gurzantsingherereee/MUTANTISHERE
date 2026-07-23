@@ -32,6 +32,9 @@ jobs:
       - name: Prepare numbered image placeholders
         run: node prepare-pages.js
 
+      - name: Enhance packaging comparison
+        run: node enhance-comparison.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
