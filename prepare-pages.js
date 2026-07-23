@@ -157,6 +157,9 @@ const headInjection = `
   .document-card{min-height:330px;display:flex;flex-direction:column;padding:30px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));transition:border-color .3s ease,background .3s ease,transform .3s ease}
   .document-card:hover{border-color:rgba(241,90,0,.75);background:linear-gradient(145deg,rgba(241,90,0,.13),rgba(255,255,255,.02));transform:translateY(-8px)}
   .document-card>span{color:var(--orange);font:12px ui-monospace,monospace}.document-card strong{margin:auto 0 12px;font-size:clamp(1.8rem,3vw,3rem);line-height:.95;letter-spacing:-.05em;text-transform:uppercase}.document-card small{color:var(--grey)}.document-card b{margin-top:26px;color:var(--orange);font-size:.8rem}
+  a.pdf-missing{opacity:.5;cursor:not-allowed;filter:grayscale(.4)}
+  a.pdf-missing:hover{transform:none!important;border-color:var(--line)!important;background:rgba(255,255,255,.03)!important}
+  a.pdf-missing b{color:#ff9b73!important}
   .section:after{content:"";position:absolute;left:50%;bottom:0;width:min(1240px,calc(100vw - 44px));height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);transform:translateX(-50%)}
   .cursor-glow{position:fixed;left:0;top:0;width:420px;height:420px;border-radius:50%;z-index:0;pointer-events:none;background:radial-gradient(circle,rgba(241,90,0,.075),transparent 66%);transform:translate(-50%,-50%);will-change:transform}
   @keyframes wavexFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(.7deg)}}
@@ -193,6 +196,23 @@ const bodyInjection = `
     document.querySelectorAll('.slot img,.hero-layer img').forEach(function(img){
       img.addEventListener('load',function(){markImageReady(img);});
       if(img.complete&&img.naturalWidth>0) markImageReady(img);
+    });
+
+    document.querySelectorAll('a[href$=".pdf"]').forEach(function(link){
+      const url=link.getAttribute('href');
+      fetch(url,{method:'HEAD',cache:'no-store'}).then(function(response){
+        if(!response.ok) throw new Error('PDF missing');
+      }).catch(function(){
+        link.classList.add('pdf-missing');
+        link.setAttribute('aria-disabled','true');
+        link.setAttribute('title','This PDF has not been uploaded to GitHub yet.');
+        const label=link.querySelector('b');
+        if(label) label.textContent='PDF not uploaded';
+        link.addEventListener('click',function(event){
+          event.preventDefault();
+          alert('This PDF has not been uploaded yet. Add it to the pdf folder using the exact filename shown in the repository instructions.');
+        });
+      });
     });
 
     const hero=document.querySelector('.hero');
@@ -242,4 +262,4 @@ html = html.replace('</head>', headInjection + '\n</head>');
 html = html.replace('</body>', bodyInjection + '\n</body>');
 
 fs.writeFileSync('index.html', html);
-console.log('Prepared 64 numbered image slots with creative motion and project-document links.');
+console.log('Prepared 64 numbered image slots, motion effects, PDF status checks and project-document links.');
