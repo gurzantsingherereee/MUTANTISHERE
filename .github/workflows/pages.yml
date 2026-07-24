@@ -44,6 +44,9 @@ jobs:
       - name: Rebuild design strategy
         run: node enhance-design-strategy.js
 
+      - name: Apply responsive compatibility fixes
+        run: node responsive-fixes.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
