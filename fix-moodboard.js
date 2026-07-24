@@ -8,7 +8,6 @@ if (!fs.existsSync(file)) {
 let html = fs.readFileSync(file, 'utf8');
 const version = String(process.env.GITHUB_SHA || Date.now().toString(36)).slice(0, 12);
 
-/* Always point the Moodboard to the uploaded numbered assets and bypass stale caches. */
 for (let number = 7; number <= 12; number += 1) {
   const source = new RegExp(`assets/images/${number}\\.png(?:\\?v=[^"']*)?`, 'g');
   html = html.replace(source, `assets/images/${number}.png?v=${version}`);
@@ -16,24 +15,37 @@ for (let number = 7; number <= 12; number += 1) {
 
 const styles = `
 <style id="wavex-moodboard-final-fix">
-  /* Final, deterministic Moodboard layout. */
+  /*
+    Use the uploaded image canvases as the layout source.
+    No forced card ratio, no cropping, no black bars.
+  */
   .mood-grid {
-    display: grid !important;
-    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-    grid-template-rows:
-      clamp(320px, 32vw, 450px)
-      clamp(250px, 22vw, 330px)
-      clamp(300px, 28vw, 410px) !important;
+    display: flex !important;
+    flex-direction: column !important;
     gap: clamp(14px, 1.5vw, 20px) !important;
-    align-items: stretch !important;
     margin-top: clamp(40px, 5vw, 64px) !important;
   }
 
-  .mood-grid > .slot {
+  .mood-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(14px, 1.5vw, 20px);
+    align-items: start;
+  }
+
+  .mood-stack {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 1.5vw, 20px);
+    min-width: 0;
+  }
+
+  .mood-grid > .slot,
+  .mood-stack > .slot {
     position: relative !important;
     display: block !important;
     width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
     max-width: none !important;
@@ -41,144 +53,55 @@ const styles = `
     padding: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
-    isolation: isolate;
     border: 1px solid rgba(255,255,255,.12) !important;
     border-radius: clamp(18px, 2vw, 28px) !important;
     background: #0b0b09 !important;
     box-shadow: 0 22px 64px rgba(0,0,0,.26);
     aspect-ratio: auto !important;
+    isolation: isolate;
   }
 
-  .mood-grid > .slot::before,
-  .mood-grid > .slot::after,
-  .mood-grid > .slot > .slot-copy,
-  .mood-grid > .slot > .slot-path {
+  .mood-grid .slot::before,
+  .mood-grid .slot::after,
+  .mood-grid .slot > .slot-copy,
+  .mood-grid .slot > .slot-path {
     display: none !important;
   }
 
-  .mood-grid > .slot > img {
-    position: absolute !important;
-    inset: 0 !important;
+  .mood-grid .slot > img {
+    position: relative !important;
+    inset: auto !important;
     display: block !important;
     width: 100% !important;
-    height: 100% !important;
-    min-width: 100% !important;
-    min-height: 100% !important;
-    max-width: none !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
     max-height: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
     object-position: center center !important;
     transform: none !important;
     scale: 1 !important;
-    filter: saturate(.97) contrast(1.025);
+    filter: saturate(.98) contrast(1.02);
     transition: filter .3s ease !important;
   }
 
-  .mood-grid > .slot:hover > img {
+  .mood-grid .slot:hover > img {
     transform: none !important;
     scale: 1 !important;
-    filter: saturate(1.02) contrast(1.045) brightness(1.02);
+    filter: saturate(1.02) contrast(1.04) brightness(1.02);
   }
 
-  /* Desktop composition: hero + portrait, three details, panoramic close. */
-  .mood-grid > .mood-card-7,
-  .mood-grid > .slot:nth-child(1) {
-    grid-column: 1 / span 8 !important;
-    grid-row: 1 !important;
-  }
-
-  .mood-grid > .mood-card-8,
-  .mood-grid > .slot:nth-child(2) {
-    grid-column: 9 / span 4 !important;
-    grid-row: 1 !important;
-  }
-
-  .mood-grid > .mood-card-9,
-  .mood-grid > .slot:nth-child(3) {
-    grid-column: 1 / span 4 !important;
-    grid-row: 2 !important;
-  }
-
-  .mood-grid > .mood-card-10,
-  .mood-grid > .slot:nth-child(4) {
-    grid-column: 5 / span 4 !important;
-    grid-row: 2 !important;
-  }
-
-  .mood-grid > .mood-card-11,
-  .mood-grid > .slot:nth-child(5) {
-    grid-column: 9 / span 4 !important;
-    grid-row: 2 !important;
-  }
-
-  .mood-grid > .mood-card-12,
-  .mood-grid > .slot:nth-child(6) {
-    grid-column: 1 / -1 !important;
-    grid-row: 3 !important;
-  }
-
-  @media (max-width: 980px) {
-    .mood-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      grid-template-rows: none !important;
-      grid-auto-rows: auto !important;
-    }
-
-    .mood-grid > .slot,
-    .mood-grid > .slot:nth-child(n) {
-      grid-column: auto !important;
-      grid-row: auto !important;
-      width: 100% !important;
-      height: auto !important;
-    }
-
-    .mood-grid > .mood-card-7,
-    .mood-grid > .mood-card-12,
-    .mood-grid > .slot:nth-child(1),
-    .mood-grid > .slot:nth-child(6) {
-      grid-column: 1 / -1 !important;
-      aspect-ratio: 16 / 9 !important;
-    }
-
-    .mood-grid > .mood-card-8,
-    .mood-grid > .mood-card-11,
-    .mood-grid > .slot:nth-child(2),
-    .mood-grid > .slot:nth-child(5) {
-      aspect-ratio: 4 / 5 !important;
-    }
-
-    .mood-grid > .mood-card-9,
-    .mood-grid > .mood-card-10,
-    .mood-grid > .slot:nth-child(3),
-    .mood-grid > .slot:nth-child(4) {
-      aspect-ratio: 1 / 1 !important;
-    }
-  }
-
-  @media (max-width: 680px) {
-    .mood-grid {
-      grid-template-columns: 1fr !important;
-      gap: 14px !important;
-    }
-
-    .mood-grid > .slot,
-    .mood-grid > .slot:nth-child(n) {
-      grid-column: 1 / -1 !important;
-      grid-row: auto !important;
-    }
-
-    .mood-grid > .mood-card-7,
-    .mood-grid > .mood-card-12,
-    .mood-grid > .slot:nth-child(1),
-    .mood-grid > .slot:nth-child(6) {
-      aspect-ratio: 16 / 10 !important;
+  @media (max-width: 760px) {
+    .mood-detail-grid {
+      grid-template-columns: 1fr;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .mood-grid > .slot > img {
+    .mood-grid .slot > img {
       transition: none !important;
     }
   }
@@ -201,21 +124,18 @@ const script = `
     return 0;
   }
 
-  Array.prototype.forEach.call(grid.children, function (holder) {
-    if (!holder.classList || !holder.classList.contains('slot')) return;
-
+  var cards = {};
+  Array.prototype.forEach.call(grid.querySelectorAll('.slot'), function (holder) {
     var img = holder.querySelector('img');
     if (!img) return;
 
     var number = getAssetNumber(img);
     if (number < 7 || number > 12) return;
 
-    for (var oldNumber = 7; oldNumber <= 12; oldNumber += 1) {
-      holder.classList.remove('mood-card-' + oldNumber);
-    }
-
+    cards[number] = holder;
     holder.classList.remove('media-fit', 'media-fill', 'asset-ratio-frame', 'cinematic-media');
     holder.classList.add('mood-card', 'mood-card-' + number);
+
     holder.style.removeProperty('--asset-ratio');
     holder.style.removeProperty('grid-row-end');
     holder.style.removeProperty('grid-column');
@@ -223,10 +143,35 @@ const script = `
     holder.style.removeProperty('height');
     holder.style.removeProperty('aspect-ratio');
 
-    img.style.objectFit = 'cover';
+    img.style.objectFit = 'contain';
     img.style.objectPosition = 'center center';
     img.style.transform = 'none';
   });
+
+  if (!cards[7] || !cards[8] || !cards[9] || !cards[10] || !cards[11] || !cards[12]) return;
+
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+
+  var details = document.createElement('div');
+  details.className = 'mood-detail-grid';
+
+  var left = document.createElement('div');
+  left.className = 'mood-stack mood-stack-left';
+  left.appendChild(cards[8]);
+  left.appendChild(cards[9]);
+
+  var right = document.createElement('div');
+  right.className = 'mood-stack mood-stack-right';
+  right.appendChild(cards[10]);
+  right.appendChild(cards[11]);
+
+  details.appendChild(left);
+  details.appendChild(right);
+
+  grid.appendChild(cards[7]);
+  grid.appendChild(details);
+  grid.appendChild(cards[12]);
+  grid.classList.add('mood-layout-ready');
 })();
 </script>`;
 
@@ -241,4 +186,4 @@ html = html.replace('</head>', `${styles}\n</head>`);
 html = html.replace('</body>', `${script}\n</body>`);
 fs.writeFileSync(file, html);
 
-console.log('Moodboard layout fixed: assets 7.png through 12.png use a stable responsive grid.');
+console.log('Moodboard fixed using the natural proportions of uploaded assets 7.png through 12.png.');
