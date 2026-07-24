@@ -15,18 +15,17 @@ const visualLanguageAssets = [
   { number: 16, legacy: 'assets/icons/route-pattern.svg' }
 ];
 
-visualLanguageAssets.forEach(({ number, legacy }) => {
-  const target = `assets/images/${number}.png?v=${version}`;
-  html = html.split(legacy).join(target);
+visualLanguageAssets.forEach(function (asset) {
+  const target = `assets/images/${asset.number}.png?v=${version}`;
+  html = html.split(asset.legacy).join(target);
   html = html.replace(
-    new RegExp(`assets/images/${number}\\.png(?:\\?v=[^"']*)?`, 'g'),
+    new RegExp(`assets/images/${asset.number}\\.png(?:\\?v=[^"']*)?`, 'g'),
     target
   );
 });
 
 const styles = `
 <style id="wavex-visual-language-fix">
-  /* Polished Visual Language system using uploaded assets 13–16. */
   .visual-language-section {
     overflow: hidden;
   }
@@ -80,10 +79,11 @@ const styles = `
     text-wrap: balance;
   }
 
+  /* Uploaded Visual Language assets 13–16 are square and stay square everywhere. */
   .visual-language-section .texture-grid {
     display: grid !important;
-    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-    grid-template-rows: auto auto !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important;
     gap: clamp(14px, 1.5vw, 20px) !important;
     margin-top: clamp(20px, 2.5vw, 32px) !important;
     align-items: stretch !important;
@@ -92,12 +92,15 @@ const styles = `
   .visual-language-section .texture-grid > .slot {
     position: relative !important;
     display: block !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
     width: 100% !important;
     height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
     max-width: none !important;
     max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
     padding: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
@@ -135,40 +138,6 @@ const styles = `
     transition: filter .3s ease !important;
   }
 
-  .visual-language-section .texture-grid > .visual-language-card-13,
-  .visual-language-section .texture-grid > .slot:nth-child(1) {
-    grid-column: 1 / span 4 !important;
-    grid-row: 1 !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  .visual-language-section .texture-grid > .visual-language-card-14,
-  .visual-language-section .texture-grid > .slot:nth-child(2) {
-    grid-column: 5 / span 4 !important;
-    grid-row: 1 !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  .visual-language-section .texture-grid > .visual-language-card-15,
-  .visual-language-section .texture-grid > .slot:nth-child(3) {
-    grid-column: 9 / span 4 !important;
-    grid-row: 1 !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  .visual-language-section .texture-grid > .visual-language-card-16,
-  .visual-language-section .texture-grid > .slot:nth-child(4) {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-    aspect-ratio: 2 / 1 !important;
-  }
-
-  .visual-language-section .texture-grid > .visual-language-card-16 > img,
-  .visual-language-section .texture-grid > .slot:nth-child(4) > img {
-    object-fit: contain !important;
-    background: #0b0b09;
-  }
-
   .visual-language-section .texture-grid > .slot:hover > img {
     transform: none !important;
     scale: 1 !important;
@@ -182,28 +151,13 @@ const styles = `
 
     .visual-language-section .texture-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      grid-template-rows: none !important;
     }
 
     .visual-language-section .texture-grid > .slot,
     .visual-language-section .texture-grid > .slot:nth-child(n) {
       grid-column: auto !important;
       grid-row: auto !important;
-    }
-
-    .visual-language-section .texture-grid > .visual-language-card-13,
-    .visual-language-section .texture-grid > .visual-language-card-14,
-    .visual-language-section .texture-grid > .visual-language-card-15,
-    .visual-language-section .texture-grid > .slot:nth-child(1),
-    .visual-language-section .texture-grid > .slot:nth-child(2),
-    .visual-language-section .texture-grid > .slot:nth-child(3) {
       aspect-ratio: 1 / 1 !important;
-    }
-
-    .visual-language-section .texture-grid > .visual-language-card-16,
-    .visual-language-section .texture-grid > .slot:nth-child(4) {
-      grid-column: 1 / -1 !important;
-      aspect-ratio: 2 / 1 !important;
     }
   }
 
@@ -225,11 +179,7 @@ const styles = `
     .visual-language-section .texture-grid > .slot:nth-child(n) {
       grid-column: 1 / -1 !important;
       grid-row: auto !important;
-    }
-
-    .visual-language-section .texture-grid > .visual-language-card-16,
-    .visual-language-section .texture-grid > .slot:nth-child(4) {
-      aspect-ratio: 16 / 9 !important;
+      aspect-ratio: 1 / 1 !important;
     }
   }
 
@@ -249,22 +199,19 @@ const script = `
   var section = textureGrid.closest('.section');
   if (section) section.classList.add('visual-language-section');
 
-  function getAssetNumber(img, index) {
-    var raw = Number(img.getAttribute('data-asset-number') || 0);
-    if (raw >= 13 && raw <= 16) return raw;
-
-    var src = img.getAttribute('src') || '';
-    var match = src.match(/assets\\/images\\/(13|14|15|16)\\.png/i);
-    return Number((match && match[1]) || (13 + index));
-  }
-
   Array.prototype.forEach.call(textureGrid.children, function (holder, index) {
     if (!holder.classList || !holder.classList.contains('slot')) return;
 
     var img = holder.querySelector('img');
     if (!img) return;
 
-    var number = getAssetNumber(img, index);
+    var number = Number(img.getAttribute('data-asset-number') || 0);
+    if (number < 13 || number > 16) {
+      var src = img.getAttribute('src') || '';
+      var match = src.match(/assets\\/images\\/(13|14|15|16)\\.png/i);
+      number = Number((match && match[1]) || (13 + index));
+    }
+
     if (number < 13 || number > 16) return;
 
     for (var oldNumber = 13; oldNumber <= 16; oldNumber += 1) {
@@ -278,9 +225,9 @@ const script = `
     holder.style.removeProperty('grid-column');
     holder.style.removeProperty('grid-row');
     holder.style.removeProperty('height');
-    holder.style.removeProperty('aspect-ratio');
+    holder.style.setProperty('aspect-ratio', '1 / 1', 'important');
 
-    img.style.objectFit = number === 16 ? 'contain' : 'cover';
+    img.style.objectFit = 'cover';
     img.style.objectPosition = 'center center';
     img.style.transform = 'none';
   });
@@ -298,4 +245,4 @@ html = html.replace('</head>', `${styles}\n</head>`);
 html = html.replace('</body>', `${script}\n</body>`);
 fs.writeFileSync(file, html);
 
-console.log('Visual Language fixed: uploaded assets 13.png through 16.png use a polished responsive layout.');
+console.log('Visual Language fixed: assets 13.png through 16.png use a consistent 1:1 responsive grid.');
