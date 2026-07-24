@@ -44,6 +44,9 @@ jobs:
       - name: Rebuild design strategy
         run: node enhance-design-strategy.js
 
+      - name: Fix Design Strategy image mapping
+        run: node fix-design-strategy-map.js
+
       - name: Apply responsive compatibility fixes
         run: node responsive-fixes.js
 
