@@ -5,181 +5,129 @@ let html = fs.readFileSync(file, 'utf8');
 
 const styles = `
 <style id="wavex-final-image-frame-fix">
-  /*
-    Final full-site media contract.
-    Every normal image uses its own canvas ratio, remains completely visible,
-    and cannot be enlarged or cropped by earlier desktop/mobile rules.
-  */
-
-  img {
-    max-width: 100%;
-  }
+  /* Final image-frame system.
+     Lifestyle/editorial imagery fills its frame with no empty bars.
+     Product cutouts, packaging and documents stay fully visible. */
 
   .slot,
   .ds-visual,
   .comparison .slot,
   .signature-visual {
     position: relative;
-    box-sizing: border-box;
     overflow: hidden;
+    min-width: 0;
   }
 
-  .slot.asset-ratio-frame,
-  .comparison .slot.asset-ratio-frame,
-  .signature-visual.asset-ratio-frame {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    aspect-ratio: var(--asset-ratio, 16 / 10) !important;
-    padding: 0 !important;
-    background: #0b0b09;
-  }
-
-  .slot.asset-ratio-frame > img,
-  .comparison .slot.asset-ratio-frame > img,
-  .signature-visual.asset-ratio-frame > img {
-    position: absolute !important;
-    inset: 0 !important;
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    object-fit: contain !important;
-    object-position: center center !important;
-    transform: none !important;
-    scale: 1 !important;
-  }
-
-  /* Remove duplicate blurred image layers that can make the artwork appear cropped. */
-  .slot.asset-ratio-frame.cinematic-media::after,
-  .comparison .slot.asset-ratio-frame.cinematic-media::after,
-  .signature-visual.asset-ratio-frame.cinematic-media::after {
-    display: none !important;
-  }
-
-  /* Atmospheric full-screen areas intentionally fill the viewport. */
-  .hero-bg,
-  .final-bg,
-  .hero-composite-slot {
-    overflow: hidden;
-  }
-
-  .hero-bg img,
-  .final-bg img,
-  .hero-composite-slot > img {
-    position: absolute !important;
-    inset: 0 !important;
+  .slot > img,
+  .ds-image,
+  .comparison .slot > img,
+  .signature-visual > img {
+    display: block;
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
     max-height: none !important;
+    object-position: center center !important;
+    transform: none !important;
+  }
+
+  /* Full-bleed lifestyle, feature, moodboard and ecommerce scenes. */
+  .media-fill > img,
+  .ds-visual > .ds-image {
     object-fit: cover !important;
   }
 
-  /* Design Strategy images are all authored at 2400 × 1600. */
-  .ds-experience {
+  /* Product cutouts, packaging, manuals, dielines and comparison assets. */
+  .media-fit > img,
+  .comparison .slot > img {
+    object-fit: contain !important;
+  }
+
+  /* Disable the blurred duplicate layer once the real image fills the frame. */
+  .media-fill.cinematic-media::after,
+  .ds-visual.cinematic-media::after,
+  .big-idea-responsive.cinematic-media::after {
+    display: none !important;
+  }
+
+  /* Big Idea image 5.png is a true 16:9 full-bleed frame. */
+  .big-idea-responsive,
+  .slot.media-asset-5 {
+    width: 100%;
+    height: auto !important;
     min-height: 0 !important;
-    align-items: stretch;
+    aspect-ratio: 16 / 9 !important;
+    padding: 0 !important;
+    background: #090907;
+  }
+
+  .big-idea-responsive > img,
+  .slot.media-asset-5 > img {
+    position: absolute !important;
+    inset: 0 !important;
+    object-fit: cover !important;
+  }
+
+  /* Desktop Design Strategy: image panel stretches to the exact panel height,
+     so no blank strip appears above or below the artwork. */
+  .ds-experience {
+    align-items: stretch !important;
   }
 
   .ds-visual {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    aspect-ratio: 3 / 2 !important;
+    align-self: stretch !important;
+    width: 100%;
+    height: 100% !important;
+    min-height: 100% !important;
+    aspect-ratio: auto !important;
     background: #090907;
   }
 
   .ds-image {
     position: absolute !important;
     inset: 0 !important;
-    display: block;
-    width: 100% !important;
-    height: 100% !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    object-fit: contain !important;
-    object-position: center center !important;
+    object-fit: cover !important;
+  }
+
+  .ds-image.active,
+  .ds-visual:hover > .ds-image,
+  .slot.has-image:hover > img,
+  .signature-visual:hover > img {
     transform: none !important;
-    scale: 1 !important;
   }
 
-  .ds-image.active {
-    transform: none !important;
-    scale: 1 !important;
-  }
-
-  .ds-visual.cinematic-media::after {
-    display: none !important;
-  }
-
+  /* Keep the visual overlays subtle and fully inside the image. */
   .ds-visual-shade {
     background:
-      linear-gradient(180deg, rgba(0,0,0,.15), transparent 28%, transparent 68%, rgba(0,0,0,.48)),
-      linear-gradient(90deg, transparent 72%, rgba(0,0,0,.07));
+      linear-gradient(180deg, rgba(0,0,0,.14), transparent 28%, transparent 67%, rgba(0,0,0,.54)),
+      linear-gradient(90deg, transparent 72%, rgba(0,0,0,.08));
   }
 
   .ds-visual-topline {
-    top: clamp(12px, 2vw, 24px);
-    left: clamp(12px, 2vw, 26px);
-    right: clamp(12px, 2vw, 26px);
+    top: clamp(14px, 2vw, 24px);
+    left: clamp(14px, 2vw, 26px);
+    right: clamp(14px, 2vw, 26px);
   }
 
   .ds-visual-caption {
-    left: clamp(12px, 2vw, 28px);
-    right: clamp(12px, 2vw, 28px);
-    bottom: clamp(12px, 2vw, 24px);
-    font-size: clamp(2rem, 6vw, 6rem);
+    left: clamp(14px, 2vw, 28px);
+    right: clamp(14px, 2vw, 28px);
+    bottom: clamp(14px, 2vw, 24px);
+    font-size: clamp(2.4rem, 6vw, 6rem);
   }
 
-  /* Big Idea is a 16:9 master image on every screen. */
-  .big-idea-responsive,
-  .slot.asset-5-frame {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    aspect-ratio: 16 / 9 !important;
-  }
-
-  /* Stop all hover, parallax and touch transforms from moving images outside frames. */
-  .slot.asset-ratio-frame:hover > img,
-  .slot.has-image:hover > img,
-  .ds-visual:hover > .ds-image,
-  .signature-visual:hover > img,
-  .comparison .slot:hover > img {
-    transform: none !important;
-    scale: 1 !important;
-  }
-
-  .mood-grid,
-  .panel-grid,
-  .production-grid,
-  .anatomy-grid,
-  .inbox-grid,
-  .pdp-grid,
-  .document-grid {
-    align-items: start;
-  }
-
+  /* On stacked tablet/mobile layouts, return the visual to its source 3:2 ratio. */
   @media (max-width: 980px) {
     .ds-experience {
       grid-template-columns: 1fr !important;
+      min-height: 0 !important;
     }
 
-    .ds-visual {
+    .ds-visual,
+    .ds-experience .ds-visual {
+      width: 100%;
+      height: auto !important;
+      min-height: 0 !important;
       aspect-ratio: 3 / 2 !important;
     }
   }
@@ -187,34 +135,12 @@ const styles = `
   @media (max-width: 680px) {
     .ds-visual,
     .ds-experience .ds-visual {
-      width: 100% !important;
-      height: auto !important;
-      min-height: 0 !important;
       aspect-ratio: 3 / 2 !important;
       border-radius: 0;
     }
 
     .ds-visual-caption {
-      font-size: clamp(1.8rem, 12vw, 4rem);
-    }
-
-    .slot.asset-ratio-frame,
-    .comparison .slot.asset-ratio-frame,
-    .signature-visual.asset-ratio-frame {
-      width: 100% !important;
-      height: auto !important;
-      min-height: 0 !important;
-      max-height: none !important;
-      aspect-ratio: var(--asset-ratio, 16 / 10) !important;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .slot.asset-ratio-frame > img,
-    .ds-image,
-    .signature-visual > img {
-      transition: none !important;
-      animation: none !important;
+      font-size: clamp(2rem, 13vw, 4.2rem);
     }
   }
 </style>`;
@@ -222,76 +148,61 @@ const styles = `
 const script = `
 <script id="wavex-final-image-frame-script">
 (function(){
-  /* Ratios are applied before load to avoid layout jumps. Natural dimensions
-     replace these values after load, so future replacement images also fit. */
-  const ratios={
-    2:[2200,3200],3:[2200,3000],4:[2200,3000],5:[2560,1440],6:[2400,1600],
-    7:[2000,1500],8:[1600,2000],9:[1600,1600],10:[1600,1600],11:[1600,2000],12:[2000,1500],
-    13:[2048,2048],14:[2048,2048],15:[2048,2048],16:[2400,1200],17:[2000,2800],18:[2200,3300],
-    19:[2200,3200],20:[2600,1800],21:[1600,2000],22:[1600,2000],23:[1600,2000],24:[1600,2000],
-    25:[2200,3300],26:[2600,1800],27:[2200,2200],28:[2200,2200],29:[2560,1440],30:[2560,1440],
-    31:[2560,1440],32:[2560,1440],33:[2560,1440],34:[2560,1440],35:[2400,1600],36:[2400,1600],
-    37:[2400,1600],38:[2200,2200],39:[2200,2200],40:[2200,2200],41:[2200,1600],42:[2200,1600],
-    43:[2200,1600],44:[2200,1600],45:[2200,1600],46:[2200,1600],47:[2000,2000],48:[2000,2000],
-    49:[2000,2000],50:[2000,2000],51:[2000,2000],52:[2000,2000],53:[2000,2000],54:[2000,2000],
-    55:[2000,2000],56:[2000,2000],57:[2000,1500],58:[2000,1500],59:[2000,1500],60:[2000,1500],
-    61:[2000,1500],62:[2000,1500],63:[2560,1440]
-  };
+  /* Assets designed as immersive full-bleed scenes. */
+  const fillAssets = new Set([
+    1,5,6,7,8,9,10,11,12,13,14,15,16,
+    29,30,31,32,33,34,35,36,37,
+    41,42,43,44,45,46,
+    51,52,53,54,55,56,
+    57,58,59,60,61,62,63,64
+  ]);
 
-  function isAtmospheric(img){
-    return !!img.closest('.hero-bg,.final-bg,.hero-composite-slot');
-  }
+  /* Assets that must never be cropped. */
+  const fitAssets = new Set([
+    2,3,4,17,18,19,20,21,22,23,24,25,26,27,28,
+    38,39,40,47,48,49,50
+  ]);
 
-  function holderFor(img){
-    return img.closest('.slot,.signature-visual,.comparison .slot');
-  }
+  function classify(img){
+    const holder = img.closest('.slot,.signature-visual');
+    if(!holder) return;
 
-  function setRatio(holder,width,height){
-    if(!holder||!width||!height)return;
-    holder.style.setProperty('--asset-ratio',String(width)+' / '+String(height));
-    holder.classList.add('asset-ratio-frame','image-frame-ready');
-  }
+    const raw = img.getAttribute('data-asset-number') || '';
+    const src = img.getAttribute('src') || '';
+    const match = src.match(/assets\/images\/(\d+)\.png/i);
+    const number = Number(raw || (match && match[1]) || 0);
 
-  function prepare(img){
-    if(isAtmospheric(img))return;
+    holder.classList.remove('media-fill','media-fit');
 
-    if(img.classList.contains('ds-image')){
-      const ds=img.closest('.ds-visual');
-      if(ds)ds.classList.add('image-frame-ready');
-      img.style.objectPosition='center center';
-      return;
+    if(number){
+      holder.classList.add('media-asset-' + number);
+      if(fillAssets.has(number)) holder.classList.add('media-fill');
+      else if(fitAssets.has(number)) holder.classList.add('media-fit');
+      else holder.classList.add('media-fit');
+    } else {
+      holder.classList.add('media-fit');
     }
 
-    const holder=holderFor(img);
-    if(!holder)return;
-
-    const asset=Number(img.dataset.assetNumber||'');
-    if(asset===5)holder.classList.add('asset-5-frame');
-    if(ratios[asset])setRatio(holder,ratios[asset][0],ratios[asset][1]);
-
-    const applyNatural=function(){
-      if(img.naturalWidth>0&&img.naturalHeight>0){
-        setRatio(holder,img.naturalWidth,img.naturalHeight);
-      }
-      img.style.objectPosition='center center';
-      img.style.transform='none';
-    };
-
-    img.addEventListener('load',applyNatural,{passive:true});
-    if(img.complete&&img.naturalWidth>0)applyNatural();
+    if(number === 5) holder.classList.add('big-idea-responsive');
   }
 
-  document.querySelectorAll('.slot img,.ds-image,.signature-visual img,.comparison img').forEach(prepare);
+  function prepare(){
+    document.querySelectorAll('.slot img,.signature-visual img').forEach(classify);
+    document.querySelectorAll('.ds-visual').forEach(function(holder){
+      holder.classList.add('media-fill');
+    });
+  }
 
-  /* Feature/manual viewers replace src at runtime; recalculate their frame. */
-  const observer=new MutationObserver(function(records){
+  prepare();
+
+  const observer = new MutationObserver(function(records){
     records.forEach(function(record){
-      if(record.type==='attributes'&&record.target.tagName==='IMG')prepare(record.target);
+      if(record.target && record.target.tagName === 'IMG') classify(record.target);
     });
   });
 
-  document.querySelectorAll('.slot img,.ds-image,.signature-visual img,.comparison img').forEach(function(img){
-    observer.observe(img,{attributes:true,attributeFilter:['src']});
+  document.querySelectorAll('.slot img,.signature-visual img').forEach(function(img){
+    observer.observe(img,{attributes:true,attributeFilter:['src','data-asset-number']});
   });
 })();
 </script>`;
@@ -302,4 +213,4 @@ html = html.replace('</head>', styles + '\n</head>');
 html = html.replace('</body>', script + '\n</body>');
 
 fs.writeFileSync(file, html);
-console.log('Applied exact-ratio full-visibility framing to every website image.');
+console.log('Removed empty image bars and applied full-bleed versus full-visibility media rules.');
