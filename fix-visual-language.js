@@ -79,7 +79,7 @@ const styles = `
     text-wrap: balance;
   }
 
-  /* Uploaded Visual Language assets 13–16 are square and stay square everywhere. */
+  /* All uploaded Visual Language assets remain in a consistent square grid. */
   .visual-language-section .texture-grid {
     display: grid !important;
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
@@ -121,6 +121,7 @@ const styles = `
   .visual-language-section .texture-grid > .slot > img {
     position: absolute !important;
     inset: 0 !important;
+    z-index: 2;
     display: block !important;
     width: 100% !important;
     height: 100% !important;
@@ -138,10 +139,65 @@ const styles = `
     transition: filter .3s ease !important;
   }
 
-  .visual-language-section .texture-grid > .slot:hover > img {
+  /* Asset 16 gets a premium square treatment without cropping its artwork. */
+  .visual-language-section .texture-grid > .visual-language-card-16 {
+    border-color: rgba(241,90,0,.28) !important;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(241,90,0,.13), transparent 46%),
+      linear-gradient(145deg, #17150f, #080807 72%) !important;
+    box-shadow:
+      0 24px 70px rgba(0,0,0,.34),
+      inset 0 0 0 1px rgba(255,255,255,.035);
+  }
+
+  .visual-language-section .texture-grid > .visual-language-card-16::before {
+    content: "";
+    position: absolute;
+    inset: -10%;
+    z-index: 0;
+    display: block !important;
+    background-image: url("assets/images/16.png?v=${version}");
+    background-size: cover;
+    background-position: center;
+    opacity: .26;
+    filter: blur(24px) saturate(1.08) contrast(1.04);
+    transform: scale(1.12);
+    pointer-events: none;
+  }
+
+  .visual-language-section .texture-grid > .visual-language-card-16::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block !important;
+    background:
+      linear-gradient(180deg, rgba(8,8,7,.05), rgba(8,8,7,.32)),
+      radial-gradient(circle at center, transparent 44%, rgba(8,8,7,.42) 100%);
+    pointer-events: none;
+  }
+
+  .visual-language-section .texture-grid > .visual-language-card-16 > img {
+    z-index: 2;
+    box-sizing: border-box;
+    object-fit: contain !important;
+    object-position: center center !important;
+    padding: clamp(14px, 1.9vw, 28px) !important;
+    filter: drop-shadow(0 16px 28px rgba(0,0,0,.34)) saturate(1.02) contrast(1.02);
+  }
+
+  .visual-language-section .texture-grid > .slot:hover > img,
+  .visual-language-section .texture-grid > .visual-language-card-16:hover > img {
     transform: none !important;
     scale: 1 !important;
+  }
+
+  .visual-language-section .texture-grid > .slot:hover > img {
     filter: saturate(1.035) contrast(1.045) brightness(1.015);
+  }
+
+  .visual-language-section .texture-grid > .visual-language-card-16:hover > img {
+    filter: drop-shadow(0 18px 32px rgba(0,0,0,.38)) saturate(1.04) contrast(1.03) brightness(1.015);
   }
 
   @media (max-width: 980px) {
@@ -180,6 +236,10 @@ const styles = `
       grid-column: 1 / -1 !important;
       grid-row: auto !important;
       aspect-ratio: 1 / 1 !important;
+    }
+
+    .visual-language-section .texture-grid > .visual-language-card-16 > img {
+      padding: clamp(12px, 4vw, 22px) !important;
     }
   }
 
@@ -227,7 +287,7 @@ const script = `
     holder.style.removeProperty('height');
     holder.style.setProperty('aspect-ratio', '1 / 1', 'important');
 
-    img.style.objectFit = 'cover';
+    img.style.objectFit = number === 16 ? 'contain' : 'cover';
     img.style.objectPosition = 'center center';
     img.style.transform = 'none';
   });
@@ -245,4 +305,4 @@ html = html.replace('</head>', `${styles}\n</head>`);
 html = html.replace('</body>', `${script}\n</body>`);
 fs.writeFileSync(file, html);
 
-console.log('Visual Language fixed: assets 13.png through 16.png use a consistent 1:1 responsive grid.');
+console.log('Visual Language fixed: asset 16 uses a premium full-visibility square treatment.');
