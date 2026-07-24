@@ -62,6 +62,9 @@ jobs:
       - name: Apply final image frame fixes
         run: node fix-image-frames.js
 
+      - name: Remove Big Idea letterboxing
+        run: node fix-big-idea-letterbox.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
