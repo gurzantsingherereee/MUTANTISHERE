@@ -71,6 +71,9 @@ jobs:
       - name: Rebuild Visual Experience layout
         run: node fix-visual-experience.js
 
+      - name: Rebuild Visual Language layout
+        run: node fix-visual-language.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
