@@ -53,6 +53,9 @@ jobs:
       - name: Optimize cinematic responsive performance
         run: node cinematic-performance.js
 
+      - name: Fix Big Idea responsive media
+        run: node fix-big-idea-media.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
