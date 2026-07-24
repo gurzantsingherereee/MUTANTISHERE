@@ -147,3 +147,5 @@ html = html.replace('</body>', script + '\n</body>');
 
 fs.writeFileSync(file, html);
 console.log('Removed Big Idea top and bottom letterboxing with automatic dark-border detection.');
+
+require('./fix-moodboard.js');
