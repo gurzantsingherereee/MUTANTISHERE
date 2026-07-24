@@ -65,6 +65,9 @@ jobs:
       - name: Remove Big Idea letterboxing
         run: node fix-big-idea-letterbox.js
 
+      - name: Rebuild Moodboard editorial layout
+        run: node fix-moodboard.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
