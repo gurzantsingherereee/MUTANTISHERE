@@ -59,6 +59,9 @@ jobs:
       - name: Fix Big Idea responsive media
         run: node fix-big-idea-media.js
 
+      - name: Apply final image frame fixes
+        run: node fix-image-frames.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
