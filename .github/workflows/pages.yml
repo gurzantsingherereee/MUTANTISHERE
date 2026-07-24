@@ -41,6 +41,9 @@ jobs:
       - name: Add packaging typography names
         run: node apply-font.js
 
+      - name: Rebuild design strategy
+        run: node enhance-design-strategy.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
