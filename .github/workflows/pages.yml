@@ -47,6 +47,9 @@ jobs:
       - name: Apply responsive compatibility fixes
         run: node responsive-fixes.js
 
+      - name: Apply responsive image compatibility
+        run: node smart-media.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
