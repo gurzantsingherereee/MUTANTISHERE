@@ -68,6 +68,9 @@ jobs:
       - name: Rebuild Moodboard editorial layout
         run: node fix-moodboard.js
 
+      - name: Rebuild Visual Experience layout
+        run: node fix-visual-experience.js
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
