@@ -38,7 +38,7 @@ jobs:
       - name: Rebuild hero composition
         run: node fix-hero.js
 
-      - name: Apply WAVEX display font
+      - name: Add packaging typography names
         run: node apply-font.js
 
       - name: Upload site
