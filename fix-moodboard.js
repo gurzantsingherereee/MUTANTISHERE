@@ -11,30 +11,26 @@ for (let n = 7; n <= 12; n += 1) {
 
 const styles = `
 <style id="wavex-moodboard-final-fix">
-  /* Responsive editorial masonry for Moodboard assets 7–12. */
+  /* Curated cinematic bento grid for Moodboard assets 7–12. */
   .mood-grid {
-    --mood-gap: clamp(12px, 1.45vw, 20px);
-    --mood-row: 8px;
     display: grid !important;
     grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-    grid-auto-rows: var(--mood-row) !important;
-    grid-auto-flow: row dense !important;
-    gap: var(--mood-gap) !important;
-    align-items: start !important;
+    grid-template-rows: repeat(2, clamp(250px, 27vw, 390px)) !important;
+    gap: clamp(12px, 1.5vw, 20px) !important;
     margin-top: clamp(38px, 5vw, 64px) !important;
+    align-items: stretch !important;
   }
 
   .mood-grid .slot {
     position: relative !important;
     display: block !important;
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
     min-height: 0 !important;
     max-height: none !important;
     padding: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
-    isolation: isolate;
     border: 1px solid rgba(255,255,255,.12) !important;
     border-radius: clamp(18px, 2vw, 28px) !important;
     background: #0b0b09 !important;
@@ -63,53 +59,54 @@ const styles = `
     object-fit: cover !important;
     object-position: center center !important;
     transform: none !important;
-    scale: 1 !important;
-    filter: saturate(.96) contrast(1.02);
+    filter: saturate(.96) contrast(1.03);
     transition: filter .35s ease !important;
   }
 
   .mood-grid .slot:hover > img {
     transform: none !important;
-    scale: 1 !important;
-    filter: saturate(1.03) contrast(1.04) brightness(1.025);
+    filter: saturate(1.03) contrast(1.05) brightness(1.025);
   }
 
-  /* Editorial rhythm: two large landscapes balanced by portrait and square details. */
-  .mood-grid .mood-asset-7,
-  .mood-grid .mood-asset-12 {
-    grid-column: span 8 !important;
-  }
+  /* Desktop composition: one hero, two details, then a balanced second row. */
+  .mood-grid .mood-asset-7 { grid-column: 1 / span 7 !important; grid-row: 1 !important; }
+  .mood-grid .mood-asset-8 { grid-column: 8 / span 3 !important; grid-row: 1 !important; }
+  .mood-grid .mood-asset-9 { grid-column: 11 / span 2 !important; grid-row: 1 !important; }
+  .mood-grid .mood-asset-10 { grid-column: 1 / span 3 !important; grid-row: 2 !important; }
+  .mood-grid .mood-asset-11 { grid-column: 4 / span 3 !important; grid-row: 2 !important; }
+  .mood-grid .mood-asset-12 { grid-column: 7 / span 6 !important; grid-row: 2 !important; }
 
-  .mood-grid .mood-asset-8,
-  .mood-grid .mood-asset-9,
-  .mood-grid .mood-asset-10,
-  .mood-grid .mood-asset-11 {
-    grid-column: span 4 !important;
-  }
+  .mood-grid .mood-asset-8 > img,
+  .mood-grid .mood-asset-11 > img { object-position: center center !important; }
 
   @media (max-width: 980px) {
     .mood-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      grid-auto-rows: 8px !important;
+      grid-template-rows: none !important;
+      grid-auto-rows: clamp(230px, 44vw, 360px) !important;
     }
 
     .mood-grid .mood-asset-7,
     .mood-grid .mood-asset-12 {
       grid-column: 1 / -1 !important;
+      grid-row: auto !important;
+      aspect-ratio: 16 / 9 !important;
     }
 
     .mood-grid .mood-asset-8,
     .mood-grid .mood-asset-9,
     .mood-grid .mood-asset-10,
     .mood-grid .mood-asset-11 {
-      grid-column: span 1 !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+      aspect-ratio: 4 / 5 !important;
     }
   }
 
   @media (max-width: 680px) {
     .mood-grid {
       grid-template-columns: 1fr !important;
-      grid-auto-rows: 6px !important;
+      grid-auto-rows: auto !important;
       gap: 14px !important;
     }
 
@@ -121,6 +118,22 @@ const styles = `
     .mood-grid .mood-asset-11,
     .mood-grid .mood-asset-12 {
       grid-column: 1 / -1 !important;
+      grid-row: auto !important;
+    }
+
+    .mood-grid .mood-asset-7,
+    .mood-grid .mood-asset-12 {
+      aspect-ratio: 16 / 10 !important;
+    }
+
+    .mood-grid .mood-asset-8,
+    .mood-grid .mood-asset-11 {
+      aspect-ratio: 4 / 5 !important;
+    }
+
+    .mood-grid .mood-asset-9,
+    .mood-grid .mood-asset-10 {
+      aspect-ratio: 1 / 1 !important;
     }
   }
 
@@ -135,87 +148,25 @@ const script = `
   const grid = document.querySelector('.mood-grid');
   if(!grid) return;
 
-  const fallbackRatios = {
-    7: [2000,1500],
-    8: [1600,2000],
-    9: [1600,1600],
-    10:[1600,1600],
-    11:[1600,2000],
-    12:[2000,1500]
-  };
-
-  function assetNumber(img){
+  grid.querySelectorAll('img').forEach(function(img){
     const raw = img.getAttribute('data-asset-number') || '';
     const src = img.getAttribute('src') || '';
     const match = src.match(/assets\\/images\\/(7|8|9|10|11|12)\\.png/i);
-    return Number(raw || (match && match[1]) || 0);
-  }
-
-  function prepareCard(img){
-    const number = assetNumber(img);
-    if(number < 7 || number > 12) return null;
+    const number = Number(raw || (match && match[1]) || 0);
+    if(number < 7 || number > 12) return;
 
     const holder = img.closest('.slot');
-    if(!holder) return null;
+    if(!holder) return;
 
     holder.classList.remove('media-fit','asset-ratio-frame','cinematic-media','media-fill');
     holder.classList.add('mood-editorial-card','mood-asset-' + number);
     holder.style.removeProperty('--asset-ratio');
+    holder.style.removeProperty('grid-row-end');
 
     img.style.objectFit = 'cover';
     img.style.objectPosition = 'center center';
     img.style.transform = 'none';
-    return holder;
-  }
-
-  function resizeCard(holder){
-    const img = holder.querySelector('img');
-    if(!img) return;
-
-    const number = assetNumber(img);
-    const fallback = fallbackRatios[number] || [4,3];
-    const naturalWidth = img.naturalWidth || fallback[0];
-    const naturalHeight = img.naturalHeight || fallback[1];
-    const ratio = naturalHeight / naturalWidth;
-    const width = holder.getBoundingClientRect().width;
-    if(!width) return;
-
-    const styles = getComputedStyle(grid);
-    const row = parseFloat(styles.gridAutoRows) || 8;
-    const gap = parseFloat(styles.rowGap) || 16;
-    const height = width * ratio;
-    const span = Math.max(1, Math.ceil((height + gap) / (row + gap)));
-
-    holder.style.gridRowEnd = 'span ' + span;
-  }
-
-  const cards = [];
-  grid.querySelectorAll('img').forEach(function(img){
-    const holder = prepareCard(img);
-    if(!holder) return;
-    cards.push(holder);
-    const update = function(){ resizeCard(holder); };
-    if(img.complete && img.naturalWidth) update();
-    img.addEventListener('load', update, {passive:true});
   });
-
-  function resizeAll(){ cards.forEach(resizeCard); }
-
-  let frame = 0;
-  function queueResize(){
-    cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(resizeAll);
-  }
-
-  if('ResizeObserver' in window){
-    const observer = new ResizeObserver(queueResize);
-    observer.observe(grid);
-  } else {
-    addEventListener('resize', queueResize, {passive:true});
-  }
-
-  addEventListener('load', resizeAll, {once:true});
-  queueResize();
 })();
 </script>`;
 
@@ -225,4 +176,4 @@ html = html.replace('</head>', styles + '\n</head>');
 html = html.replace('</body>', script + '\n</body>');
 
 fs.writeFileSync(file, html);
-console.log('Rebuilt Moodboard assets 7.png through 12.png as a responsive editorial masonry layout.');
+console.log('Rebuilt Moodboard as a balanced responsive cinematic bento grid.');
