@@ -29,51 +29,6 @@ jobs:
         with:
           enablement: true
 
-      - name: Prepare numbered image placeholders
-        run: node prepare-pages.js
-
-      - name: Enhance packaging comparison
-        run: node enhance-comparison.js
-
-      - name: Rebuild hero composition
-        run: node fix-hero.js
-
-      - name: Add packaging typography names
-        run: node apply-font.js
-
-      - name: Rebuild design strategy
-        run: node enhance-design-strategy.js
-
-      - name: Fix Design Strategy image mapping
-        run: node fix-design-strategy-map.js
-
-      - name: Apply responsive compatibility fixes
-        run: node responsive-fixes.js
-
-      - name: Apply responsive image compatibility
-        run: node smart-media.js
-
-      - name: Optimize cinematic responsive performance
-        run: node cinematic-performance.js
-
-      - name: Fix Big Idea responsive media
-        run: node fix-big-idea-media.js
-
-      - name: Apply final image frame fixes
-        run: node fix-image-frames.js
-
-      - name: Remove Big Idea letterboxing
-        run: node fix-big-idea-letterbox.js
-
-      - name: Rebuild Moodboard editorial layout
-        run: node fix-moodboard.js
-
-      - name: Rebuild Visual Experience layout
-        run: node fix-visual-experience.js
-
-      - name: Rebuild Visual Language layout
-        run: node fix-visual-language.js
-
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
