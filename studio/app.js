@@ -81,17 +81,26 @@ updateScrollEffects();
 const menuToggle = document.querySelector(".menu-toggle");
 const nav = document.getElementById("site-nav");
 if (menuToggle && nav) {
-  menuToggle.addEventListener("click", () => {
-    const open = menuToggle.getAttribute("aria-expanded") !== "true";
+  const menuLabel = menuToggle.querySelector("span");
+  const setMenuState = (open) => {
     menuToggle.setAttribute("aria-expanded", String(open));
     nav.classList.toggle("open", open);
     document.body.classList.toggle("menu-open", open);
+    if (menuLabel) menuLabel.textContent = open ? "Close" : "Menu";
+  };
+  menuToggle.addEventListener("click", () => {
+    const open = menuToggle.getAttribute("aria-expanded") !== "true";
+    setMenuState(open);
   });
   nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
-    menuToggle.setAttribute("aria-expanded", "false");
-    nav.classList.remove("open");
-    document.body.classList.remove("menu-open");
+    setMenuState(false);
   }));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
+      setMenuState(false);
+      menuToggle.focus();
+    }
+  });
 }
 
 const cursor = document.querySelector(".cursor");
