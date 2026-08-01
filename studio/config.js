@@ -1,5 +1,5 @@
 window.STUDIO_CONFIG = {
-  name: "STUDIO // 00",
+  name: "STUDIO—01",
   publicEmail: "",
   email: "",
   formEndpoint: "",
@@ -9,6 +9,5 @@ window.STUDIO_CONFIG = {
     slack: { channelId: "" },
     analytics: { provider: "", siteId: "" }
   },
-  location: "New Delhi, India",
-  currency: "INR"
+  location: "New Delhi, India"
 };
