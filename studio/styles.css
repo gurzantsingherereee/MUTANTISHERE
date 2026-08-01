@@ -455,8 +455,9 @@ html.motion-ready .reveal.visible { opacity: 1; transform: none; }
 
   .field-guide { padding-top: 100px; padding-bottom: 100px; }
   .field-heading { margin-bottom: 55px; }
-  .field-tabs { display: flex; overflow-x: auto; }
-  .field-tabs button { flex: 0 0 145px; border-bottom: 0 !important; }
+  .field-tabs { display: flex; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: x proximity; }
+  .field-tabs::-webkit-scrollbar { display: none; }
+  .field-tabs button { flex: 0 0 145px; border-bottom: 0 !important; scroll-snap-align: start; }
   .field-panel { min-height: 500px; grid-template-columns: 1fr; gap: 28px; }
   .field-panel > p:first-child { font-size: 50px; }
   #platform-list { grid-column: 1; }
@@ -480,6 +481,7 @@ html.motion-ready .reveal.visible { opacity: 1; transform: none; }
 
   .case-title { padding-top: 105px; }
   .case-title h1 { font-size: clamp(66px, 20vw, 96px); }
+  .case-title h1 em { font-size: .85em; }
   .case-title > div { display: grid; gap: 10px; }
   .case-scroll { display: none; }
   .case-hero > figure img { object-position: 63% center; }
@@ -505,13 +507,14 @@ html.motion-ready .reveal.visible { opacity: 1; transform: none; }
   .case-close-grid h2 { font-size: 66px; }
 
   .archive-hero { min-height: 72svh; padding-top: 110px; }
-  .archive-hero h1 { font-size: clamp(66px, 20vw, 96px); }
+  .archive-hero h1 { font-size: clamp(48px, 15vw, 72px); line-height: .72; }
   .archive-hero > div { grid-template-columns: 1fr; }
   .archive-hero > div span { justify-self: start; }
   .archive-filter { top: 0; display: block; overflow: hidden; }
   .archive-filter p { margin-bottom: 12px; }
-  .archive-filter > div { flex-wrap: nowrap; justify-content: start; overflow-x: auto; padding-bottom: 4px; }
-  .archive-filter button { flex: 0 0 auto; }
+  .archive-filter > div { max-width: 100%; min-width: 0; flex-wrap: nowrap; justify-content: start; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: x proximity; }
+  .archive-filter > div::-webkit-scrollbar { display: none; }
+  .archive-filter button { flex: 0 0 auto; scroll-snap-align: start; }
   .work-grid { grid-template-columns: 1fr; padding-top: 30px; }
   .work-card.work-wide { grid-column: span 1; }
   .work-card.work-wide figure, .work-card figure { aspect-ratio: 1/1; }
